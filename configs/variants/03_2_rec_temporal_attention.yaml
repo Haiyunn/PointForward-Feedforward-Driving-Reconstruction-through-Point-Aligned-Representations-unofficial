@@ -1,0 +1,71 @@
+variant:
+  name: 03_2_rec_temporal_attention
+  train_module: scripts.train_rec
+  infer_module: scripts.infer_rec
+seed: 0
+output: results/by_version/03_2_rec_temporal_attention/new_runs
+data:
+  layout: drivestudio
+  root: /mnt/data/dataset/notr/processed/training
+  split_file: splits/waymo_ds.json
+  cameras: [0, 1, 2]
+  clip_length: 20
+  num_context: 4
+  frame_stride: 5
+  num_target: 4
+  resolution: [576, 768]
+  resolutions: [[352, 512], [576, 768]]
+  max_instances: 24
+  load_lidar: true
+  require_lidar: true
+  require_instances: true
+  require_contiguous: true
+  apply_opencv2waymo: true
+model:
+  variant: rec_temporal_attention
+  backbone: tf_efficientnetv2_s
+  feat_dim: 128
+  color_dim: 128
+  hidden: 128
+  num_static: 100000
+  num_dynamic: 10000
+  fusion_chunk: 32768
+  decoder_chunk: 131072
+  grad_checkpoint: true
+  depth_view_chunk: 3
+  backbone_view_chunk: 3
+  stream_queries: true
+  freeze_backbone_bn: true
+  refiner_view_chunk: 1
+  lpips_chunk: 1
+rec:
+  num_windows: 2
+  temporal_attention: {heads: 8, layers: 2, max_memory_frames: 64}
+  scene_fusion:
+    heads: 8
+    layers: 2
+    ffn_mult: 2
+    voxel_size: 2.0
+    max_anchors: 8192
+    chunk_size: 32768
+    grad_checkpoint: true
+    deterministic_cache: true
+  gaussian_map: {voxel_size: 0.5, max_gaussians: 100000}
+depth:
+  kind: infinidepth
+  repo_root: /mnt/data/why/InfiniDepth
+  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  variant: InfiniDepth_DepthSensor
+  encoder: vitl16
+train:
+  warm_start: /mnt/data/why/PointForwardRec/runs/waymo_ds_rec/ckpt_002500.pt
+  steps: 5000
+  batch_size: 4
+  lr: 0.0001
+  weight_decay: 0.05
+  warmup_steps: 250
+  lpips_weight: 0.2
+  grad_clip: 1.0
+  num_workers: 4
+  log_every: 1
+  save_every: 100

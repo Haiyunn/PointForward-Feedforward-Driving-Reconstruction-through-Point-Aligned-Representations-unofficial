@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "base_config": "configs/variants/01_base.yaml",
+  "base_checkpoint": "/root/data/why/PointForward/clip20/runs/waymo_ds_paper/ckpt_020000.pt",
+  "split_file": "splits/waymo_ds.json",
+  "split": "val",
+  "camera": 0,
+  "fps": 10,
+  "num_frames": 180,
+  "scenes": [
+    {"scene": "005", "start_frame": 0},
+    {"scene": "025", "start_frame": 0},
+    {"scene": "049", "start_frame": 0},
+    {"scene": "082", "start_frame": 0},
+    {"scene": "102", "start_frame": 0},
+    {"scene": "146", "start_frame": 0},
+    {"scene": "213", "start_frame": 0},
+    {"scene": "245", "start_frame": 0},
+    {"scene": "314", "start_frame": 0},
+    {"scene": "438", "start_frame": 0}
+  ]
+}

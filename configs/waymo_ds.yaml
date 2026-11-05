@@ -1,0 +1,77 @@
+# PointForward reproduction -- Waymo, DriveStudio/OmniRe preprocessing layout.
+#
+# This is the primary config: it is the only layout on disk that carries
+# per-frame LiDAR, so it supports the paper's main setting (InfiniDepth's
+# depth-sensor variant prompted with the projected sweep).
+#
+# Schedule follows the paper: 45K iterations, batch 8, AdamW at 5e-4 with 2K
+# warmup then cosine decay, multi-resolution inputs, L1 + 0.2*LPIPS.
+
+seed: 0
+output: runs/waymo_ds
+
+data:
+  layout: drivestudio
+  root: /mnt/data/dataset/notr/processed/training
+  # Only scenes carrying BOTH a real LiDAR sweep and instance annotations are
+  # usable for the full setting; the loader filters and the split is derived
+  # from that filtered list by scripts/make_split.py.
+  require_lidar: true
+  require_instances: true
+  load_lidar: true
+  # Scene-level split; regenerate with scripts/make_split.py.
+  split_file: splits/waymo_ds.json
+  cameras: [0, 1, 2]          # the paper's "frontal three cameras"
+  # 20-frame (2 s) clips; context at 0, 0.5, 1.0, 1.5 s -> stride 5 at 10 FPS.
+  # V = 4 frames x 3 cameras = 12 input views.
+  clip_length: 20
+  num_context: 4
+  frame_stride: 5
+  num_target: 4               # rendered per iteration, drawn from the clip
+  resolution: [576, 768]
+  resolutions:
+    # InfiniDepth's DINOv3 backbone (encoder: vitl16) hard-asserts each input
+    # dimension is a multiple of the patch size (16); [350, 518] and
+    # [700, 1036] are not (AssertionError: "Input image height 350 is not a
+    # multiple of patch height 16"), so they crash real depth prediction the
+    # moment they're sampled. Snapped to the nearest multiples of 16,
+    # preserving the original aspect ratios.
+    - [352, 512]
+    - [576, 768]
+    - [704, 1040]
+  max_instances: 24
+
+model:
+  backbone: tf_efficientnetv2_s
+  feat_dim: 128
+  color_dim: 128              # N_c
+  hidden: 128
+  num_static: 100000          # N_s per view -> N = V*Ns + O*Nd
+  num_dynamic: 10000          # N_d per instance
+  use_weighted_fusion: true
+  use_depth_cue: true
+  fusion_chunk: 65536
+  decoder_chunk: 262144
+  grad_checkpoint: true
+
+depth:
+  kind: infinidepth
+  repo_root: /mnt/data/why/InfiniDepth
+  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  variant: InfiniDepth_DepthSensor
+  encoder: vitl16
+
+train:
+  steps: 45000
+  batch_size: 8
+  lr: 5.0e-4
+  weight_decay: 0.05
+  warmup_steps: 2000
+  lpips_weight: 0.2
+  grad_clip: 1.0
+  bf16: true
+  num_workers: 8
+  log_every: 50
+  eval_every: 2000
+  eval_batches: 20
+  save_every: 2000

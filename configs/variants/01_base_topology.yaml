@@ -1,0 +1,65 @@
+variant:
+  name: 01_base_topology
+  train_module: scripts.train
+  infer_module: scripts.eval
+seed: 0
+output: results/by_version/01_base_topology/new_runs
+data:
+  layout: drivestudio
+  root: /mnt/data/dataset/notr/processed/training
+  split_file: splits/waymo_ds.json
+  cameras: [0, 1, 2]
+  clip_length: 20
+  num_context: 4
+  frame_stride: 5
+  num_target: 4
+  resolution: [352, 512]
+  max_instances: 24
+  load_lidar: true
+  require_lidar: true
+  require_instances: true
+  apply_opencv2waymo: true
+model:
+  variant: base
+  backbone: tf_efficientnetv2_s
+  feat_dim: 128
+  color_dim: 128
+  hidden: 128
+  num_static: 2048
+  num_dynamic: 256
+  use_weighted_fusion: true
+  use_depth_cue: true
+  fusion_chunk: 8192
+  decoder_chunk: 32768
+  grad_checkpoint: true
+  topology:
+    enabled: true
+    hidden: 64
+    voxel_size: 0.05
+    merge_radius: 0.02
+    feature_similarity: 0.9
+    merge_threshold: 0.5
+    max_input_points: 32768
+    temperature: 1.0
+    max_update: 0.1
+depth:
+  kind: infinidepth
+  repo_root: /mnt/data/why/InfiniDepth
+  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  variant: InfiniDepth_DepthSensor
+  encoder: vitl16
+train:
+  steps: 2000
+  batch_size: 1
+  lr: 0.0001
+  weight_decay: 0.05
+  warmup_steps: 100
+  lpips_weight: 0.2
+  topology_weight: 0.001
+  grad_clip: 1.0
+  bf16: true
+  num_workers: 2
+  log_every: 50
+  eval_every: 500
+  eval_batches: 10
+  save_every: 500

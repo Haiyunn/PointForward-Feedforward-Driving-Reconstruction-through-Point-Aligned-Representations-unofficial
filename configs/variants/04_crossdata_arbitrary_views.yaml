@@ -1,0 +1,59 @@
+variant:
+  name: 04_crossdata_arbitrary_views
+  train_module: scripts.train_crossdata
+  infer_module: scripts.infer_crossdata
+seed: 0
+output: results/by_version/04_crossdata_arbitrary_views/new_runs
+data:
+  layout: drivestudio
+  root: /mnt/data/dataset/notr/processed/training
+  split_file: splits/waymo_ds_5cam_3way.json
+  cameras: [0, 1, 2, 3, 4]
+  variable_views: true
+  min_cameras: 2
+  clip_length: 20
+  clip_stride: 20
+  require_contiguous: true
+  num_context: 4
+  num_target: 2
+  frame_stride: 5
+  load_lidar: true
+  require_lidar: true
+  require_instances: true
+  apply_opencv2waymo: true
+  resolution: [576, 768]
+  resolutions: [[352, 512], [576, 768]]
+  max_instances: 24
+model:
+  variant: crossdata_sh_variable
+  backbone: tf_efficientnetv2_s
+  feat_dim: 128
+  sh_degree: 3
+  hidden: 128
+  num_static: 100000
+  num_dynamic: 10000
+  fusion_chunk: 65536
+  decoder_chunk: 262144
+  grad_checkpoint: true
+  backbone_view_chunk: 1
+  depth_view_chunk: 1
+  stream_queries: true
+depth:
+  kind: infinidepth
+  repo_root: /mnt/data/why/InfiniDepth
+  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  variant: InfiniDepth_DepthSensor
+  encoder: vitl16
+train:
+  steps: 6000
+  batch_size: 3
+  lr: 0.0005
+  weight_decay: 0.05
+  warmup_steps: 1000
+  lpips_weight: 0.2
+  grad_clip: 1.0
+  num_workers: 8
+  log_every: 50
+  eval_every: 1000
+  eval_batches: 20
+  save_every: 1000

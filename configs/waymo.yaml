@@ -1,0 +1,73 @@
+# PointForward reproduction -- Waymo (StreetGaussian-processed NOTR layout).
+#
+# Schedule follows the paper: 45K iterations, batch 8, AdamW at 5e-4 with 2K
+# warmup then cosine decay, multi-resolution inputs, L1 + 0.2*LPIPS.
+
+seed: 0
+output: runs/waymo_base
+
+data:
+  layout: streetgaussian       # StreetGaussian/NOTR layout; legacy 3-scene config, not the main line (see waymo_ds.yaml)
+  root: /mnt/data/dataset/notr/processed
+  # Held out by scene so validation measures generalisation to unseen scenes,
+  # not just to unseen frames of a scene the model has already fit.
+  train_scenes: [notr_049, notr_058, notr_003]
+  val_scenes: ["031"]
+  cameras: [0, 1, 2]          # the paper's "frontal three cameras"
+  # Context frames at 0, 0.5, 1.0, 1.5 s of a 2 s clip -- at 10 FPS that is a
+  # stride of 5 frames.  V = 4 frames x 3 cameras = 12 input views.
+  num_context: 4
+  frame_stride: 5
+  # The paper supervises on the 20-frame clip; we render a random subset per
+  # iteration to bound rasterisation cost, which is equivalent in expectation.
+  num_target: 4
+  resolution: [576, 768]      # the paper's training crop
+  resolutions:                # multi-resolution training pool
+    # InfiniDepth's DINOv3 backbone (encoder: vitl16) hard-asserts each input
+    # dimension is a multiple of the patch size (16); [350, 518] and
+    # [700, 1036] are not (AssertionError: "Input image height 350 is not a
+    # multiple of patch height 16"), so they crash real depth prediction the
+    # moment they're sampled. Snapped to the nearest multiples of 16,
+    # preserving the original aspect ratios.
+    - [352, 512]
+    - [576, 768]
+    - [704, 1040]
+  max_instances: 24
+
+model:
+  backbone: tf_efficientnetv2_s
+  feat_dim: 128
+  color_dim: 128              # N_c
+  hidden: 128
+  num_static: 100000          # N_s per view  -> N = V*Ns + O*Nd
+  num_dynamic: 10000          # N_d per instance
+  use_weighted_fusion: true
+  use_depth_cue: true
+  # N runs past a million with the settings above, so fusion and decoding are
+  # chunked and recomputed in the backward pass.  Both are exact; see
+  # test_fusion_chunking_is_exact.
+  fusion_chunk: 65536
+  decoder_chunk: 262144
+  grad_checkpoint: true
+
+depth:
+  kind: infinidepth           # or "constant" for a pipeline dry run
+  repo_root: /mnt/data/why/InfiniDepth
+  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  variant: InfiniDepth_DepthSensor
+  encoder: vitl16
+
+train:
+  steps: 45000
+  batch_size: 8               # clips per optimiser step (gradient accumulated)
+  lr: 5.0e-4
+  weight_decay: 0.05
+  warmup_steps: 2000
+  lpips_weight: 0.2
+  grad_clip: 1.0
+  bf16: true
+  num_workers: 8
+  log_every: 50
+  eval_every: 2000
+  eval_batches: 20
+  save_every: 2000
