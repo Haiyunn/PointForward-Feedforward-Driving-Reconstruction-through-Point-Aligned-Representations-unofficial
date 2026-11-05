@@ -8,7 +8,7 @@ images and measuring how much of each projected box falls inside the
 independently-produced ``dynamic_mask``.
 
 Usage:
-    python -m scripts.verify_waymo --root /mnt/data/dataset/notr/processed
+    python -m scripts.verify_waymo --root data/waymo/processed
 """
 
 from __future__ import annotations

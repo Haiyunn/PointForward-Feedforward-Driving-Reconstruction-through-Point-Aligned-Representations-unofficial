@@ -17,6 +17,8 @@ from pathlib import Path
 
 import numpy as np
 import yaml
+
+from pointforward.paths import add_path_args, apply_path_args
 from PIL import Image, ImageDraw
 
 
@@ -452,7 +454,7 @@ def save_preview(audit, scene, directory):
     return str(path)
 
 
-def create_plan(config_path, count=50, frames=180, seed=3, preview_dir=None):
+def create_plan(config_path, count=50, frames=180, seed=3, preview_dir=None, path_args=None):
     """Return the plan without writing it; optional previews are output-only."""
     from pointforward.data.drivestudio import WaymoDriveStudioClips
 
@@ -462,6 +464,8 @@ def create_plan(config_path, count=50, frames=180, seed=3, preview_dir=None):
         raise ValueError("--num-scenes must be positive")
     config_path = Path(config_path).absolute()
     cfg = yaml.safe_load(config_path.read_text())
+    if path_args is not None:
+        apply_path_args(cfg, path_args)
     data = cfg["data"]
     if list(data.get("cameras", CAMERAS)) != CAMERAS or data.get("clip_length", 20) != 20:
         raise ValueError("Protocol requires cameras [0,1,2] and clip_length 20")
@@ -579,11 +583,12 @@ def main():
     parser.add_argument("--frames", type=int, default=180)
     parser.add_argument("--seed", type=int, default=3)
     parser.add_argument("--no-previews", action="store_true")
+    add_path_args(parser)
     args = parser.parse_args()
     out = Path(args.out).absolute()
     try:
         plan = create_plan(args.config, args.num_scenes, args.frames, args.seed,
-                           None if args.no_previews else out.parent / "selection_preview")
+                           None if args.no_previews else out.parent / "selection_preview", args)
     except (OSError, ValueError, RuntimeError) as exc:
         parser.exit(2, f"Selection failed; no plan written: {exc}\n")
     out.parent.mkdir(parents=True, exist_ok=True)

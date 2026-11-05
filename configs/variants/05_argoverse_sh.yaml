@@ -6,7 +6,7 @@ seed: 0
 output: results/by_version/05_argoverse_sh/new_runs
 data:
   layout: drivestudio
-  root: /mnt/data/dataset/argoverse/processed/training
+  root: data/argoverse/processed/training
   split_file: splits/argoverse_7cam_3way.json
   cameras: [0, 1, 2, 3, 4, 5, 6]
   apply_opencv2waymo: false
@@ -42,8 +42,8 @@ model:
   stream_queries: true
 depth:
   kind: infinidepth
-  repo_root: /mnt/data/why/InfiniDepth
-  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth.ckpt
+  repo_root: third_party/InfiniDepth
+  checkpoint: third_party/InfiniDepth/checkpoints/depth/infinidepth.ckpt
   variant: InfiniDepth
   encoder: vitl16
 train:

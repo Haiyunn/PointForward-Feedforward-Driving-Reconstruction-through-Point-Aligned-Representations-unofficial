@@ -6,7 +6,7 @@ seed: 0
 output: results/by_version/04_crossdata_arbitrary_views/new_runs
 data:
   layout: drivestudio
-  root: /mnt/data/dataset/notr/processed/training
+  root: data/waymo/processed/training
   split_file: splits/waymo_ds_5cam_3way.json
   cameras: [0, 1, 2, 3, 4]
   variable_views: true
@@ -40,8 +40,8 @@ model:
   stream_queries: true
 depth:
   kind: infinidepth
-  repo_root: /mnt/data/why/InfiniDepth
-  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  repo_root: third_party/InfiniDepth
+  checkpoint: third_party/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
   variant: InfiniDepth_DepthSensor
   encoder: vitl16
 train:

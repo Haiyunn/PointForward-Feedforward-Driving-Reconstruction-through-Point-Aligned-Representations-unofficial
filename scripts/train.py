@@ -44,6 +44,7 @@ from pointforward.data import (
 from pointforward.losses import RenderLoss, psnr, ssim
 from pointforward.models import ConstantDepth, FrozenInfiniDepth, PointForward
 from pointforward.variants import build_model as build_variant_model
+from pointforward.paths import add_path_args, apply_path_args
 
 
 def build_depth(cfg: dict) -> torch.nn.Module:
@@ -193,10 +194,12 @@ def main() -> None:
     ap.add_argument("--steps", type=int, default=None, help="override train.steps")
     ap.add_argument("--out", default=None, help="override output dir")
     ap.add_argument("--resume", default=None)
+    add_path_args(ap)
     args = ap.parse_args()
 
     with open(args.config, "r") as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
     if args.depth:
         cfg["depth"]["kind"] = args.depth
     if args.steps:

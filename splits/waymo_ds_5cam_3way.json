@@ -1,5 +1,5 @@
 {
-  "root": "/mnt/data/dataset/notr/processed/training",
+  "root": "data/waymo/processed/training",
   "cameras": [0, 1, 2, 3, 4],
   "require_lidar": true,
   "require_instances": true,

@@ -42,7 +42,7 @@ PointForwardRec every 500 steps, and both at completion. To recover an exited ru
 use the same config and GPU set with `--resume` pointing to an existing checkpoint.
 Do not use `--resume` for the fresh PointForward training requested here.
 
-The runtime is `/root/miniconda3/envs/drivestudio/bin/python`. Launch environment:
+The runtime is `python (conda env with the dependencies)`. Launch environment:
 `OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4`,
 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`, `HF_HUB_OFFLINE=1`,
 `TRANSFORMERS_OFFLINE=1`, and `PYTHONPATH=.` from each project's directory.

@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from pointforward.data import collate_windows, to_scene_input
 from pointforward.losses import psnr, ssim
 from pointforward.variants import build_model
+from pointforward.paths import add_path_args, apply_path_args
 from scripts.train import build_depth
 from scripts.train_rec import build_windows_dataset
 
@@ -22,9 +23,11 @@ def main() -> None:
     parser.add_argument("--ckpt")
     parser.add_argument("--split", default="val")
     parser.add_argument("--max-items", type=int, default=20)
+    add_path_args(parser)
     args = parser.parse_args()
     with open(args.config, "r") as handle:
         config = yaml.safe_load(handle)
+        apply_path_args(config, args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = build_model(config, build_depth(config), inference=True).to(device)
     if args.ckpt:

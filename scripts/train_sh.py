@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from pointforward.data import collate_clip, to_scene_input
 from pointforward.losses import RenderLoss
 from pointforward.variants import build_model
+from pointforward.paths import add_path_args, apply_path_args
 from scripts.train import build_dataset, build_depth, evaluate, lr_at, setup_distributed
 
 
@@ -38,10 +39,12 @@ def main() -> None:
     parser.add_argument("--steps", type=int, default=None, help="override train.steps")
     parser.add_argument("--out", default=None, help="override output dir")
     parser.add_argument("--resume", default=None)
+    add_path_args(parser)
     args = parser.parse_args()
 
     with open(args.config, "r") as handle:
         config = yaml.safe_load(handle)
+        apply_path_args(config, args)
     if args.depth:
         config["depth"]["kind"] = args.depth
     if args.steps is not None:

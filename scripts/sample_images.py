@@ -20,6 +20,7 @@ from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 
 from pointforward.data import collate_clip, to_scene_input
+from pointforward.paths import add_path_args, apply_path_args
 
 from scripts.eval import build_model
 from scripts.train import build_dataset
@@ -34,10 +35,12 @@ def main() -> None:
     ap.add_argument("--protocol", choices=("interp", "context"), default="interp")
     ap.add_argument("--num-clips", type=int, default=6)
     ap.add_argument("--out", required=True)
+    add_path_args(ap)
     args = ap.parse_args()
 
     with open(args.config, "r") as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = build_dataset(cfg, args.split)

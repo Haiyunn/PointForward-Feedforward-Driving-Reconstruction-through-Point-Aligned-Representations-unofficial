@@ -16,6 +16,7 @@ from pointforward.data import collate_clip, to_scene_input
 from pointforward.losses import depth_rmse, psnr, ssim
 from pointforward.models import TargetViews
 from pointforward.variants import build_model as build_variant_model
+from pointforward.paths import add_path_args, apply_path_args
 from scripts.train import build_dataset, build_depth
 
 
@@ -65,10 +66,12 @@ def main() -> None:
         "--side-by-side", action="store_true",
         help="save prediction and ground truth side by side",
     )
+    add_path_args(parser)
     args = parser.parse_args()
 
     with open(args.config, "r") as handle:
         config = yaml.safe_load(handle)
+        apply_path_args(config, args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     config.setdefault("data", {})["target_lidar"] = True

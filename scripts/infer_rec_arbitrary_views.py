@@ -22,6 +22,7 @@ from pointforward.data import WaymoDriveStudioClips
 from pointforward.models import InstanceBoxes, SceneInput, TargetViews
 from scripts.train import build_depth
 from pointforward.variants import build_model as build_variant_model
+from pointforward.paths import add_path_args, apply_path_args
 
 
 def _parse_int_list(value: str) -> list[int]:
@@ -133,10 +134,12 @@ def main() -> None:
     parser.add_argument("--depth-view-chunk", type=int, default=None)
     parser.add_argument("--backbone-view-chunk", type=int, default=None)
     parser.add_argument("--refiner-view-chunk", type=int, default=None)
+    add_path_args(parser)
     args = parser.parse_args()
 
     with open(args.config, "r") as handle:
         config = yaml.safe_load(handle)
+        apply_path_args(config, args)
 
     context_frames = args.context_frames
     target_frames = args.target_frames

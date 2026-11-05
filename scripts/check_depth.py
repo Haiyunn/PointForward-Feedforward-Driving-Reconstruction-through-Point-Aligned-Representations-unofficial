@@ -37,6 +37,7 @@ import torch
 import yaml
 
 from pointforward.models import FrozenInfiniDepth
+from pointforward.paths import add_path_args, apply_path_args
 
 
 def main() -> None:
@@ -46,10 +47,12 @@ def main() -> None:
     ap.add_argument("--width", type=int, default=384)
     ap.add_argument("--views", type=int, default=2)
     ap.add_argument("--real-clip", action="store_true", help="use a real clip instead of noise")
+    add_path_args(ap)
     args = ap.parse_args()
 
     with open(args.config) as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
 
     print("building InfiniDepth ...")
     model = FrozenInfiniDepth(

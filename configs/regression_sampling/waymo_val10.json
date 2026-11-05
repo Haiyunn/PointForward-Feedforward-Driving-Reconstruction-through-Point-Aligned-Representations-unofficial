@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "base_config": "configs/variants/01_base.yaml",
-  "base_checkpoint": "/root/data/why/PointForward/clip20/runs/waymo_ds_paper/ckpt_020000.pt",
+  "base_checkpoint": "checkpoints/pointforward_waymo_20k.pt",
   "split_file": "splits/waymo_ds.json",
   "split": "val",
   "camera": 0,

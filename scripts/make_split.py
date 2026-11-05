@@ -5,7 +5,7 @@ both viewpoint and content, so a clip-level split would leak the validation set
 into training and report meaningless generalisation numbers.
 
 Usage:
-    python -m scripts.make_split --root /mnt/data/dataset/notr/processed/training \
+    python -m scripts.make_split --root data/waymo/processed/training \
         --out splits/waymo_ds.json --val-frac 0.15
 """
 

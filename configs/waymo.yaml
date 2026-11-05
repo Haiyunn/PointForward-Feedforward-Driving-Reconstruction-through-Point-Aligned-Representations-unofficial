@@ -8,7 +8,7 @@ output: runs/waymo_base
 
 data:
   layout: streetgaussian       # StreetGaussian/NOTR layout; legacy 3-scene config, not the main line (see waymo_ds.yaml)
-  root: /mnt/data/dataset/notr/processed
+  root: data/waymo/processed
   # Held out by scene so validation measures generalisation to unseen scenes,
   # not just to unseen frames of a scene the model has already fit.
   train_scenes: [notr_049, notr_058, notr_003]
@@ -52,8 +52,8 @@ model:
 
 depth:
   kind: infinidepth           # or "constant" for a pipeline dry run
-  repo_root: /mnt/data/why/InfiniDepth
-  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  repo_root: third_party/InfiniDepth
+  checkpoint: third_party/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
   variant: InfiniDepth_DepthSensor
   encoder: vitl16
 

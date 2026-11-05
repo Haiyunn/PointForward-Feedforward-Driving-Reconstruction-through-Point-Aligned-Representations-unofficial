@@ -13,7 +13,7 @@ the loader:
    centre tests inside its own box.
 
 Usage:
-    python -m scripts.verify_drivestudio --root /mnt/data/dataset/notr/processed/training
+    python -m scripts.verify_drivestudio --root data/waymo/processed/training
 """
 
 from __future__ import annotations

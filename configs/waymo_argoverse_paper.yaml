@@ -4,11 +4,11 @@ data:
   sources:
   - name: waymo
     layout: drivestudio
-    root: /mnt/data/dataset/notr/processed/training
+    root: data/waymo/processed/training
     split_file: splits/waymo_ds.json
   - name: argoverse
     layout: argoverse_drivestudio
-    root: /mnt/data/dataset/argoverse/processed/training
+    root: data/argoverse/processed/training
     split_file: splits/argoverse_ds.json
   require_lidar: true
   require_instances: true
@@ -35,8 +35,8 @@ model:
   grad_checkpoint: true
 depth:
   kind: infinidepth
-  repo_root: /mnt/data/why/InfiniDepth
-  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  repo_root: third_party/InfiniDepth
+  checkpoint: third_party/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
   variant: InfiniDepth_DepthSensor
   encoder: vitl16
 train:

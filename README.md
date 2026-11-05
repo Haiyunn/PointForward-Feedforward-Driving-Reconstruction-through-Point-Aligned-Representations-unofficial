@@ -40,17 +40,41 @@ Python 3.10+、PyTorch 2.x（CUDA）、[gsplat](https://github.com/nerfstudio-pr
 
 ## 使用
 
-数据采用 [DriveStudio](https://github.com/ziyc/drivestudio) 预处理格式。**配置与部分脚本中写死了作者服务器上的路径（如 `/mnt/data/...`），使用前请改为本地的数据 / 深度权重路径。**
+数据采用 [DriveStudio](https://github.com/ziyc/drivestudio) 预处理格式。
+
+### 路径参数
+
+所有读取配置的脚本都支持以下命令行参数（实现见 `pointforward/paths.py`），无需修改 YAML：
+
+| 参数 | 作用 | 默认值（相对仓库根目录） |
+|---|---|---|
+| `--data-root` | Waymo 数据根目录（单数据源配置即该数据源） | `data/waymo/processed/training` |
+| `--argoverse-root` | Argoverse 2 数据根目录（混合数据配置） | `data/argoverse/processed/training` |
+| `--depth-repo` | InfiniDepth 代码目录 | `third_party/InfiniDepth` |
+| `--depth-ckpt` | InfiniDepth 权重 | `third_party/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt` |
+| `--warm-start` | 热启动权重（Rec / 微调变体） | 无 |
+
+也可以直接按默认目录放置数据和权重（或建软链接），这样不需要任何参数。
+
+### 命令
 
 ```bash
 # 训练（论文设置，8 卡）
-torchrun --nproc_per_node=8 -m scripts.train --config configs/waymo_ds_paper.yaml
-# 快速冒烟测试
-python -m scripts.train --config configs/waymo_ds.yaml --depth constant --steps 4
+torchrun --nproc_per_node=8 -m scripts.train --config configs/waymo_ds_paper.yaml \
+    --data-root /path/to/waymo/processed/training \
+    --depth-repo /path/to/InfiniDepth --depth-ckpt /path/to/infinidepth_depthsensor.ckpt
+# Waymo + Argoverse 混合训练
+torchrun --nproc_per_node=8 -m scripts.train --config configs/waymo_argoverse_paper.yaml \
+    --data-root /path/to/waymo/processed/training --argoverse-root /path/to/argoverse/processed/training
+# 快速冒烟测试（不需要深度权重）
+python -m scripts.train --config configs/waymo_ds.yaml --depth constant --steps 4 --data-root /path/to/waymo/processed/training
 # 评测
-python -m scripts.eval --config configs/waymo_ds_paper.yaml --ckpt PATH/ckpt.pt
-# 各变体统一入口（见 docs/VARIANTS.md）
-python -m scripts.run_variant --config configs/variants/01_base.yaml --mode train
+python -m scripts.eval --config configs/waymo_ds_paper.yaml --ckpt PATH/ckpt.pt --data-root /path/to/waymo/processed/training
+# 各变体统一入口（见 docs/VARIANTS.md），其余参数会原样转发
+python -m scripts.run_variant --config configs/variants/03_1_rec_cross_attention.yaml --mode train \
+    --data-root /path/to/waymo/processed/training --warm-start PATH/base_ckpt.pt
+# 单元测试
+python -m pytest -q tests
 ```
 
 ## 复现结果（参考）

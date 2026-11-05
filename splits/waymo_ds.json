@@ -1,5 +1,5 @@
 {
-  "root": "/mnt/data/dataset/notr/processed/training",
+  "root": "data/waymo/processed/training",
   "require_lidar": true,
   "require_instances": true,
   "train": [

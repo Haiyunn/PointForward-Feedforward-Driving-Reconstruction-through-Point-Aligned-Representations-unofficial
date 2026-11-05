@@ -22,6 +22,7 @@ from pointforward.data.drivestudio import WaymoDriveStudioClips
 from pointforward.models import SceneInput, TargetViews
 from pointforward.models.pointforward import Gaussians
 from pointforward.models.scene_graph import assign_instances
+from pointforward.paths import add_path_args, apply_path_args
 from scripts.eval import build_model
 from scripts.render_multiscene import boxes_to, to_uint8
 from scripts.train import build_dataset
@@ -85,10 +86,12 @@ def main():
     ap.add_argument('--split', default='val')
     ap.add_argument('--frames-per-scene', type=int, default=100)
     ap.add_argument('--seed', type=int, default=3)
+    add_path_args(ap)
     args = ap.parse_args()
     torch.set_num_threads(4)
     with open(args.config) as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
     checkpoint = torch.load(args.ckpt, map_location='cpu', weights_only=False)
     assert checkpoint['step'] + 1 == 20000, 'Expected 20000 completed updates'
     del checkpoint

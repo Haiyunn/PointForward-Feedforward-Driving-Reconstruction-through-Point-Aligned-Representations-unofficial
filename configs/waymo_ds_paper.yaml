@@ -2,7 +2,7 @@ seed: 0
 output: runs/waymo_ds_paper
 data:
   layout: drivestudio
-  root: /mnt/data/dataset/notr/processed/training
+  root: data/waymo/processed/training
   require_lidar: true
   require_instances: true
   load_lidar: true
@@ -38,8 +38,8 @@ model:
   grad_checkpoint: true
 depth:
   kind: infinidepth
-  repo_root: /mnt/data/why/InfiniDepth
-  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  repo_root: third_party/InfiniDepth
+  checkpoint: third_party/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
   variant: InfiniDepth_DepthSensor
   encoder: vitl16
 train:

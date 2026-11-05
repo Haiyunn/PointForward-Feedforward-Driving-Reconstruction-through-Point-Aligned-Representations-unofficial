@@ -6,7 +6,7 @@ seed: 0
 output: results/by_version/06_rec_temporal_attention_fintuing/waymo_ds_rec_consistency_20260918
 data:
   layout: drivestudio
-  root: /mnt/data/dataset/notr/processed/training
+  root: data/waymo/processed/training
   split_file: splits/waymo_ds.json
   cameras: [0, 1, 2]
   clip_length: 20
@@ -66,12 +66,12 @@ rec:
     downsample: 2
 depth:
   kind: infinidepth
-  repo_root: /mnt/data/why/InfiniDepth
-  checkpoint: /mnt/data/why/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
+  repo_root: third_party/InfiniDepth
+  checkpoint: third_party/InfiniDepth/checkpoints/depth/infinidepth_depthsensor.ckpt
   variant: InfiniDepth_DepthSensor
   encoder: vitl16
 train:
-  warm_start: /root/data/why/PointForward/results/by_version/03_2_rec_temporal_attention/waymo_ds_rec_decoupled_20260915/ckpt_000800.pt
+  warm_start: null  # set with --warm-start PATH
   steps: 500
   batch_size: 4
   lr: 0.00001

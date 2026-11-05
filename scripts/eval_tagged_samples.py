@@ -42,6 +42,7 @@ from torchvision.utils import save_image
 
 from pointforward.data import WaymoDriveStudioClips, collate_clip, to_scene_input
 from pointforward.losses import depth_rmse, psnr, ssim
+from pointforward.paths import add_path_args, apply_path_args
 
 from scripts.eval import build_model
 from scripts.train import build_dataset
@@ -138,10 +139,12 @@ def main() -> None:
         "For one-off scenes outside the configured split (e.g. a train-split "
         "scene sampled only for visual coverage, not held-out metrics).",
     )
+    add_path_args(ap)
     args = ap.parse_args()
 
     with open(args.config, "r") as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

@@ -27,6 +27,7 @@ from PIL import Image, ImageDraw
 
 from pointforward.data.drivestudio import WaymoDriveStudioClips
 from pointforward.models import InstanceBoxes, SceneInput, TargetViews
+from pointforward.paths import add_path_args, apply_path_args
 
 from scripts.eval import build_model
 from scripts.train import build_dataset
@@ -84,10 +85,12 @@ def main() -> None:
     ap.add_argument('--duration-step', type=int, default=10)
     ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--min-instances', type=int, default=1)
+    add_path_args(ap)
     args = ap.parse_args()
 
     with open(args.config, 'r') as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     dataset = build_dataset(cfg, args.split)

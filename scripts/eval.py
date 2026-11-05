@@ -30,6 +30,7 @@ from pointforward.data import collate_clip, to_scene_input
 from pointforward.losses import depth_rmse, psnr, ssim
 from pointforward.models import PointForward
 from pointforward.variants import build_model as build_variant_model
+from pointforward.paths import add_path_args, apply_path_args
 
 from scripts.train import build_dataset, build_depth
 
@@ -73,10 +74,12 @@ def main() -> None:
         help="disable the LPIPS metric",
     )
     ap.add_argument("--out", default=None)
+    add_path_args(ap)
     args = ap.parse_args()
 
     with open(args.config, "r") as fh:
         cfg = yaml.safe_load(fh)
+        apply_path_args(cfg, args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
